@@ -1,0 +1,103 @@
+services:
+  # Hardhat Local Blockchain Node
+  hardhat-node:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.hardhat
+    ports:
+      - "8545:8545"
+    volumes:
+      - ./contracts:/app/contracts
+      - ./contracts/artifacts:/app/artifacts
+      - ./contracts/cache:/app/cache
+    environment:
+      - NODE_ENV=development
+    networks:
+      - vaccine-tracker
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8545"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Frontend React Application
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - VITE_CONTRACT_ADDRESS=${CONTRACT_ADDRESS:-0x5FbDB2315678afecb367f032d93F642f64180aa3}
+      - VITE_CHAIN_ID=31337
+    depends_on:
+      hardhat-node:
+        condition: service_healthy
+    networks:
+      - vaccine-tracker
+
+  # Prometheus Metrics Collection
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./monitoring/rules:/etc/prometheus/rules
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+      - '--web.enable-admin-api'
+    networks:
+      - vaccine-tracker
+
+  # Blockchain Metrics Exporter
+  blockchain-exporter:
+    build:
+      context: ./docker
+      dockerfile: Dockerfile.exporter
+    ports:
+      - "8080:8080"
+    environment:
+      - BLOCKCHAIN_RPC_URL=http://hardhat-node:8545
+      - CONTRACT_ADDRESS=${CONTRACT_ADDRESS:-0x5FbDB2315678afecb367f032d93F642f64180aa3}
+      - EXPORTER_PORT=8080
+    depends_on:
+      hardhat-node:
+        condition: service_healthy
+    networks:
+      - vaccine-tracker
+
+  # Grafana Dashboard
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3001:3000"
+    volumes:
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources
+      - grafana_data:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin123
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_INSTALL_PLUGINS=grafana-slack-notifier-plugin
+    depends_on:
+      - prometheus
+    networks:
+      - vaccine-tracker
+
+networks:
+  vaccine-tracker:
+    driver: bridge
+
+volumes:
+  prometheus_data:
+  grafana_data:

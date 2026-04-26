@@ -1,0 +1,25 @@
+node_modules/
+.env
+.env.local
+
+# Hardhat
+contracts/artifacts/
+contracts/cache/
+contracts/node_modules/
+contracts/deployment-info.json
+contracts/.openzeppelin/
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+
+# Monitoring data
+monitoring/grafana/data/
+prometheus_data/
+grafana_data/
+
+# Misc
+*.log
+.DS_Store
+Thumbs.db

@@ -1,0 +1,48 @@
+account_id: ""
+project_slug: "vaccine-shipment-tracker"
+provider: ""
+
+# Tenderly configuration for debugging failed transactions
+contracts:
+  - name: "ShipmentTracker"
+    address: ""
+    network: "localhost"
+
+# Export configuration for local development
+exports:
+  - name: "local-development"
+    project_slug: "vaccine-shipment-tracker"
+    contracts:
+      - name: "ShipmentTracker"
+        address: ""
+        network_id: "31337"
+
+# Simulation configuration
+simulations:
+  enabled: true
+  fork_network_id: "31337"
+
+# Monitoring configuration
+monitoring:
+  enabled: true
+  alerts:
+    - name: "Temperature Breach Alert"
+      description: "Alert when temperature breach causes transaction revert"
+      conditions:
+        - type: "transaction_failed"
+          contract: "ShipmentTracker"
+          function: "updateStatus"
+    
+    - name: "High Gas Usage"
+      description: "Alert when gas usage exceeds threshold"
+      conditions:
+        - type: "gas_usage"
+          threshold: 500000
+
+# Webhook configuration for Slack notifications
+webhooks:
+  - url: "${SLACK_WEBHOOK_URL}"
+    name: "slack-notifications"
+    events:
+      - "transaction_failed"
+      - "alert_triggered"

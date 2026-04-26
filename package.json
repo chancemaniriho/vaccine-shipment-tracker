@@ -1,0 +1,33 @@
+{
+  "name": "vaccine-shipment-tracker",
+  "version": "1.0.0",
+  "description": "Logistics tracking system for vaccine shipments with temperature monitoring",
+  "scripts": {
+    "install:all": "npm install && cd frontend && npm install && cd ../contracts && npm install",
+    "node": "cd contracts && npx hardhat node",
+    "compile": "cd contracts && npx hardhat compile",
+    "deploy:local": "cd contracts && npx hardhat run scripts/deploy.js --network localhost",
+    "test": "cd contracts && npx hardhat test",
+    "audit": "cd contracts && aderyn .",
+    "audit:setup": "node scripts/setup-aderyn.js",
+    "test:breach": "node scripts/test-temperature-breach.js",
+    "deploy:full": "node scripts/deploy-and-test.js",
+    "frontend:dev": "cd frontend && npm run dev",
+    "frontend:build": "cd frontend && npm run build",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f",
+    "monitoring:setup": "docker-compose up prometheus grafana blockchain-exporter -d",
+    "services:health": "curl -f http://localhost:5173 && curl -f http://localhost:9090 && curl -f http://localhost:3001 && curl -f http://localhost:8080/health",
+    "clean": "cd contracts && npx hardhat clean && cd ../frontend && rm -rf node_modules && npm install"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "hardhat": "^2.19.0"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.0.0",
+    "@openzeppelin/contracts-upgradeable": "^5.0.0",
+    "@openzeppelin/hardhat-upgrades": "^3.0.0"
+  }
+}

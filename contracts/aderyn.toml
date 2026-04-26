@@ -1,0 +1,37 @@
+[compilation]
+target = "contracts"
+build_info_dirs = ["artifacts/build-info"]
+
+[output]
+report_format = "json"
+output_file = "aderyn-report.json"
+stdout = true
+
+[exclusions]
+# Exclude test files and mock contracts
+exclude_paths = [
+    "test/",
+    "scripts/",
+    "node_modules/",
+    "@openzeppelin/"
+]
+
+[detectors]
+# Enable all detectors
+high = true
+medium = true
+low = true
+
+# Specific detectors relevant to our use case
+timestamp_dependency = true
+gasless_send = true
+reentrancy = true
+unchecked_return_value = true
+unprotected_upgrade = true
+state_variable_changes_without_events = true
+
+[rules]
+# Custom rules for vaccine tracking
+max_line_length = 120
+require_natspec = true
+enforce_naming_convention = true

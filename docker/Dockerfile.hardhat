@@ -1,0 +1,21 @@
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Install curl for healthcheck
+RUN apk add --no-cache curl
+
+# Copy package files
+COPY contracts/package*.json ./
+
+# Install dependencies
+RUN npm ci
+
+# Copy contract source
+COPY contracts .
+
+# Expose Hardhat node port
+EXPOSE 8545
+
+# Start Hardhat node
+CMD ["npx", "hardhat", "node", "--hostname", "0.0.0.0"]

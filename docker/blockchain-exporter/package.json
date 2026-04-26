@@ -1,0 +1,19 @@
+{
+  "name": "blockchain-exporter",
+  "version": "1.0.0",
+  "description": "Prometheus exporter for blockchain metrics",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "prom-client": "^15.1.0",
+    "ethers": "^6.10.0",
+    "node-cron": "^3.0.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.3"
+  }
+}
