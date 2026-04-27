@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react'
-import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
+import { useWriteContract, useWaitForTransactionReceipt, useAccount } from 'wagmi'
 import { CONTRACT_ADDRESS, CONTRACT_ABI } from '../config/contract'
 import { Package, Loader2, CheckCircle, AlertCircle } from 'lucide-react'
+import TrackerAuthorization from './TrackerAuthorization'
 
 function CreateShipment({ onShipmentCreated }) {
+  const { address: userAddress } = useAccount()
   const [batchNumber, setBatchNumber]     = useState('')
   const [trackerAddress, setTrackerAddress] = useState('')
   const [submitted, setSubmitted]         = useState(false)
@@ -21,6 +23,13 @@ function CreateShipment({ onShipmentCreated }) {
     onShipmentCreated?.()
   }, [isSuccess]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Pre-fill tracker address with user's wallet on mount
+  useEffect(() => {
+    if (userAddress && !trackerAddress) {
+      setTrackerAddress(userAddress)
+    }
+  }, [userAddress]) // eslint-disable-line react-hooks/exhaustive-deps
+
   const handleSubmit = (e) => {
     e.preventDefault()
     if (!batchNumber.trim() || !trackerAddress.trim()) return
@@ -36,7 +45,10 @@ function CreateShipment({ onShipmentCreated }) {
   const busy = isPending || isConfirming
 
   return (
-    <div className="max-w-md">
+    <div className="max-w-md space-y-5">
+      {/* Tracker Authorization Status */}
+      <TrackerAuthorization />
+
       <form onSubmit={handleSubmit} className="space-y-5">
         {/* Batch Number */}
         <div>
@@ -59,7 +71,7 @@ function CreateShipment({ onShipmentCreated }) {
         {/* Tracker Address */}
         <div>
           <label htmlFor="trackerAddress" className="block text-sm font-medium text-gray-700 mb-1">
-            Tracker Device Address
+            Tracker Device Address <span className="text-xs text-gray-400">(often your wallet)</span>
           </label>
           <input
             id="trackerAddress"
@@ -73,7 +85,7 @@ function CreateShipment({ onShipmentCreated }) {
                        disabled:bg-gray-50 disabled:text-gray-400"
           />
           <p className="mt-1 text-xs text-gray-400">
-            Must be an authorized tracker address (see deployment-info.json)
+            ⭐ Tip: Use your current wallet address ({userAddress?.slice(0, 6)}...{userAddress?.slice(-4)}) to update temperatures in the Sensor Simulator
           </p>
         </div>
 

@@ -4,7 +4,8 @@ import ShipmentList from './ShipmentList'
 import CreateShipment from './CreateShipment'
 import GasBudgetTracker from './GasBudgetTracker'
 import ContractStats from './ContractStats'
-import { Activity, Package, Thermometer, Wallet } from 'lucide-react'
+import SensorSimulator from './SensorSimulator'
+import { Activity, Package, Thermometer, Wallet, Radio } from 'lucide-react'
 
 function Dashboard() {
   const { address } = useAccount()
@@ -19,6 +20,7 @@ function Dashboard() {
     { id: 'overview', label: 'Overview', icon: Activity },
     { id: 'shipments', label: 'Shipments', icon: Package },
     { id: 'create', label: 'Create Shipment', icon: Thermometer },
+    { id: 'simulator', label: 'Sensor Simulator', icon: Radio },
     { id: 'gas-budget', label: 'Gas Budget', icon: Wallet },
   ]
 
@@ -88,6 +90,10 @@ function Dashboard() {
             <h3 className="text-lg font-semibold mb-4">Create New Shipment</h3>
             <CreateShipment onShipmentCreated={handleShipmentCreated} />
           </div>
+        )}
+
+        {activeTab === 'simulator' && (
+          <SensorSimulator />
         )}
 
         {activeTab === 'gas-budget' && (
